@@ -1,108 +1,63 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(TaskManagementApp());
+  runApp(ContactApp());
 }
 
-class TaskManagementApp extends StatelessWidget {
+class Contact {
+  final String name;
+  final String email;
+  final String phone;
+
+  Contact({required this.name, required this.email, required this.phone});
+}
+
+class ContactApp extends StatelessWidget {
+  final List<Contact> contacts = [
+    Contact(name: 'John Doe', email: 'john.doe@example.com', phone: '+1234567890'),
+    Contact(name: 'Jane Smith', email: 'jane.smith@example.com', phone: '+9876543210'),
+    Contact(name: 'David Johnson', email: 'david.johnson@example.com', phone: '+4567890123'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Task Management',
+      title: 'Contact List',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: TaskListScreen(),
+      home: ContactListScreen(contacts: contacts),
     );
   }
 }
 
-class TaskListScreen extends StatefulWidget {
-  @override
-  _TaskListScreenState createState() => _TaskListScreenState();
-}
+class ContactListScreen extends StatelessWidget {
+  final List<Contact> contacts;
 
-class _TaskListScreenState extends State<TaskListScreen> {
-  List<Task> _tasks = [];
+  ContactListScreen({required this.contacts});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task List'),
+        title: Text('Contact List'),
       ),
       body: ListView.builder(
-        itemCount: _tasks.length,
+        itemCount: contacts.length,
         itemBuilder: (context, index) {
-          final task = _tasks[index];
+          final contact = contacts[index];
           return ListTile(
-            title: Text(task.title),
-            subtitle: Text(task.description),
-            onTap: () => _openTaskDetailsBottomSheet(context, task),
+            title: Text(contact.name),
+            subtitle: Text(contact.email),
+            onTap: () => _openContactDetailsBottomSheet(context, contact),
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddTaskDialog(context),
-        child: Icon(Icons.add),
-      ),
     );
   }
 
-  void _showAddTaskDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String title = '';
-        String description = '';
-        DateTime deadline;
-
-        return AlertDialog(
-          title: Text('Add Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Title'),
-                onChanged: (value) => title = value,
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Description'),
-                onChanged: (value) => description = value,
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Deadline'),
-                onChanged: (value) {
-                  // Parse the input and assign to the deadline variable
-                  deadline = DateTime.parse(value);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _tasks.add(Task(title: title, description: description, deadline: deadline));
-                });
-                Navigator.pop(context);
-              },
-              child: Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _openTaskDetailsBottomSheet(BuildContext context, Task task) {
+  void _openContactDetailsBottomSheet(BuildContext context, Contact contact) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -112,20 +67,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Task Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Contact Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 16.0),
-              Text('Title: ${task.title}'),
-              Text('Description: ${task.description}'),
-              Text('Deadline: ${task.deadline}'),
+              Text('Name: ${contact.name}'),
+              Text('Email: ${contact.email}'),
+              Text('Phone: ${contact.phone}'),
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _tasks.remove(task);
-                  });
                   Navigator.pop(context);
                 },
-                child: Text('Delete Task'),
+                child: Text('Dismiss'),
               ),
             ],
           ),
@@ -134,4 +86,3 @@ class _TaskListScreenState extends State<TaskListScreen> {
     );
   }
 }
-
